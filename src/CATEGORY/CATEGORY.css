@@ -1,0 +1,132 @@
+.category_body {
+  margin-top: 80px;
+  position: absolute;
+  top: 80px;
+  left: 101px;
+  padding: 0px;
+  width: 1440px;
+  
+}
+
+.category_title {
+  font-family: Raleway;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 42px;
+  color: #1d1f22;
+}
+
+.product_list {
+
+    display: inline-flex;
+    align-items: flex-start;
+    padding: 0px;
+    margin: 0 100px 100px 0;
+    width: 354px;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: space-evenly;
+
+}
+
+.product_list:hover {
+  box-shadow: 0 1px 10px #ccc;
+  cursor: pointer;
+}
+
+.list_wraper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+.list_wraper .image_inStock .image_outOfStock {
+  padding: 10px;
+  text-align: center;
+}
+
+.list_wraper img {
+  padding: 10px;
+  text-align: center;
+  width: 354px;
+  height: 330px;
+   object-fit: cover;
+   object-position: top;
+}
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 330px;
+  width: 354px;
+  background: #ffffff;
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay p {
+  color: #8d8f9a;
+  font-size: 24px;
+  line-height: 160%;
+}
+
+.cart-circle{
+filter: drop-shadow(0px 4px 11px rgba(29, 31, 34, 0.1));
+position: absolute;
+height: 52px;
+width: 52px;
+left: 280px;
+top: 304px;
+border: none;
+background-color: #5ece7b;
+border-radius: 50px;
+
+}
+.empty-cart{
+height: 15.6px;
+position: absolute;
+left: 293px;
+top: 319px;
+}
+.cart-wheel-one{
+  position: absolute;
+left: 300px;
+top: 335px;
+}
+.cart-wheel-two{
+  position: absolute;
+  left: 309px;
+  top: 335px;
+}
+
+.item_info{
+    display:flex;
+    flex-direction: column;
+    
+   
+ 
+}
+.item_info .name{
+    font-family: Raleway;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 160%;
+    padding: 0 10px;
+    margin:0;
+    margin-top: 15px;
+}
+.item_info .price{
+    font-family: Raleway;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 160%;
+  padding: 0 10px;
+  margin:0;
+  margin-bottom: 25px;
+}
+

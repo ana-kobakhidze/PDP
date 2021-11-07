@@ -1,0 +1,70 @@
+.currency {
+  position: absolute;
+  width: 12px;
+  height: 29px;
+  left: 108px;
+  top: 6px;
+
+  font-family: Raleway;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 160%;
+
+  display: flex;
+  align-items: flex-end;
+  color: #1d1f22;
+
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+  margin: 0px 12px;
+}
+.down_arrow {
+  position: absolute;
+  left: 67%;
+  right: 20.59%;
+  bottom: 18px;
+  cursor: pointer;
+}
+
+.dropDown-background {
+  position: absolute;
+  width: 114px;
+  height: 169px;
+  top: 42px;
+  left: 101px;
+  border-radius: 0.1px;
+
+  background: white;
+  /* box-shadow: 20px 30px 50px rgb(240, 240, 240);  */
+  filter: drop-shadow(1px 12px 12px rgb(247, 247, 247));
+  overflow: hidden;
+}
+
+.dropDown-elements {
+  position: static;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+font-family: Raleway;
+font-style: normal;
+font-weight: 500;
+font-size: 18px;
+line-height: 160%;
+/* identical to box height, or 29px */
+
+text-align: center;
+cursor: pointer;
+color: #1D1F22;
+
+
+/* Inside Auto Layout */
+
+flex: none;
+order: 0;
+flex-grow: 0;
+margin: 15px 10px;
+}

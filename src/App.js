@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import React, { Component } from "react";
+import Header from './HEADER/HEADER';
+import CATEGORY from './CATEGORY/CATEGORY';
+import PDP from '../src/PDP/PDP'
+import CART from '../src/CART/CART';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+} from "react-router-dom";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+
+  render() {
+    return (
+      <Router>
+       <div className="app">
+       <Header client={ this.props.client }/>
+       <Switch>
+          <Route exact path="/">
+          <CATEGORY />
+          </Route>
+          <Route path="/men">
+          <p>Category</p>
+          </Route>
+          <Route path="/kids">
+          <p>Kids Category</p>
+          </Route>
+          <Route path="/women">
+          <PDP client={ this.props.client }/>
+          </Route>
+          <Route path="/cart">
+          <CART/>
+          </Route>
+          
+        </Switch>
+        
+        
+      </div>
+      </Router>
+    );
+  }
 }
 
 export default App;
