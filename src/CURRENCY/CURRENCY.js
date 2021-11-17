@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import { gql } from "@apollo/client";
+import { connect } from "react-redux";
+
 import "./CURRENCY.css";
+import getSymbolFromCurrency from "currency-symbol-map";
 
 const DATA_QUERY = gql`
   query {
@@ -13,7 +16,7 @@ class Currency extends Component {
     super(props);
     this.state = {
       currencies: undefined,
-      clicked: false
+      clicked: false,
     };
     this.arrowClickHandler = this.arrowClickHandler.bind(this);
   }
@@ -22,35 +25,51 @@ class Currency extends Component {
     const { client } = this.props;
     const { data } = await client.query({ query: DATA_QUERY, variables: {} });
     const { currencies } = data;
-    this.setState({ currencies: currencies });
+
+    this.setState({
+      currencies: currencies,
+    });
   }
+
   arrowClickHandler() {
     const { clicked } = this.state;
-     this.setState({clicked: !clicked })
+    this.setState({ clicked: !clicked });
+  }
+
+  clickedCurrencyHandler(currency) {
+    let symbol =
+      currency === "AUD"
+        ? "A" + getSymbolFromCurrency(currency)
+        : getSymbolFromCurrency(currency);
+
+    this.props.currentCurrencyIcon(symbol);
+
+    this.setState({ clicked: false });
   }
 
   render() {
     const { currencies } = this.state;
     const { clicked } = this.state;
+
     let dropDown = [];
-    
-    if(clicked)
-    currencies.map((element) => {
-      return (dropDown.push (
-        
-          <p className="dropDown-elements">{element}</p>
-        
-      ));
-    });
-    dropDown.push( <div className="dropDown-background">
-    {dropDown}
-  </div>);
-    console.log(dropDown)
-    
-  
+    if (clicked)
+      currencies.map((element, index) => {
+        return dropDown.push(
+          <p
+            className="dropDown-elements"
+            key={index}
+            onClick={() => this.clickedCurrencyHandler(element)}
+          >
+            {element === "AUD"
+              ? "A" + getSymbolFromCurrency(element) + " " + element
+              : getSymbolFromCurrency(element) + " " + element}
+          </p>
+        );
+      });
+
     return (
       <div>
-        <p className="currency">$</p>
+        <p className="currency">{this.props.currency}</p>
         <svg
           onClick={this.arrowClickHandler}
           className="down_arrow"
@@ -67,10 +86,23 @@ class Currency extends Component {
             strokeLinejoin="round"
           />
         </svg>
-        {dropDown}
+        <div className="dropDown-background">{dropDown}</div>
       </div>
     );
   }
 }
+const mapStateToProps = (state) => {
+  return {
+    currency: state.currency,
+  };
+};
 
-export default Currency;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    currentCurrencyIcon: (id) => {
+      dispatch({ type: "CHANGE_ICON", id: id });
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Currency);

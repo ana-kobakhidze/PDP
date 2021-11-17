@@ -1,5 +1,7 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import "./CART.css";
+import getSymbolFromCurrency from "currency-symbol-map";
 
 class Cart extends Component {
   constructor(props) {
@@ -16,9 +18,7 @@ class Cart extends Component {
   }
 
   componentDidMount() {
-    const data = localStorage.getItem("order");
-    const parsedData = data ? JSON.parse(data) : [];
-    this.setState({ orderData: parsedData });
+    this.setState({ orderData: this.props.orderData });
   }
 
   clickHandler = (productId, attributeId, itemId) => {
@@ -40,21 +40,23 @@ class Cart extends Component {
         return { ...product };
       }
     });
+
     localStorage.setItem("order", JSON.stringify(updatedorderData));
     this.setState({ orderData: updatedorderData });
   };
 
   incrementHandler = (id) => {
     const { orderData } = this.state;
-    const updatedorderData = orderData.map((product) => {
+    const updatedOrderData = orderData.map((product) => {
       if (product.id === id) {
         return { ...product, count: product.count + 1 };
       } else {
         return { ...product };
       }
     });
-    localStorage.setItem("order", JSON.stringify(updatedorderData));
-    this.setState({ orderData: updatedorderData });
+
+    localStorage.setItem("order", JSON.stringify(updatedOrderData));
+    this.setState({ orderData: updatedOrderData });
   };
 
   decrementHandler = (id) => {
@@ -66,54 +68,76 @@ class Cart extends Component {
         return { ...product };
       }
     });
+
     localStorage.setItem("order", JSON.stringify(updatedorderData));
     this.setState({ orderData: updatedorderData });
   };
 
   getProductFromState = (id) => {
-    const { orderData } = this.state;
-    return orderData.find(p => p.id === id);
-  }
-
-  updateProductInState = (updatedProduct) => {
-    const { orderData } = this.state;
-    const statedProductData = orderData.find(p => p.id === updatedProduct.id);
-    const statedProductIndex = orderData.indexOf(statedProductData);
-    orderData[statedProductIndex] = updatedProduct;
-    this.setState(orderData);
-  }
-  
-  leftSliderHandler = (id) => {
-    const product = this.getProductFromState(id);
-    let { currentPosition } = product;
-    if(currentPosition > 0){
-      currentPosition -= 1;
-      this.updateProductInState({...product, currentPosition: currentPosition});
-    }
+    return this.props.orderData.find((p) => p.id === id);
   };
+
+  leftSliderHandler = (id) => {
+    const { orderData } = this.state;
+    const updatedorderData = orderData.map((product) => {
+      if (product.id === id && product.currentPosition > 0) {
+        return { ...product, currentPosition: product.currentPosition - 1 };
+      } else {
+        return { ...product };
+      }
+    });
+
+    localStorage.setItem("order", JSON.stringify(updatedorderData));
+    this.setState({ orderData: updatedorderData });
+  };
+
   rightSliderHandler = (id) => {
-    const product = this.getProductFromState(id);
-    debugger
-    const { gallery } = product;
-    let { currentPosition } = product;
-    if(currentPosition < gallery.length - 2) {
-      currentPosition += 1;
-      this.updateProductInState({...product, currentPosition: currentPosition});
-    }
+    const { orderData } = this.state;
+    const updatedorderData = orderData.map((product) => {
+      if (
+        product.id === id &&
+        product.currentPosition < product.gallery.length - 2
+      ) {
+        return { ...product, currentPosition: product.currentPosition + 1 };
+      } else {
+        return { ...product };
+      }
+    });
+
+    localStorage.setItem("order", JSON.stringify(updatedorderData));
+    this.setState({ orderData: updatedorderData });
   };
 
   render() {
     let itemList = [];
     const { orderData } = this.state;
 
-    if (orderData && orderData.length > 0) {
+    if (orderData) {
       orderData.forEach((product) => {
         itemList.push(
           <div className="itemList-wraper" key={product.id}>
             <hr />
             <p className="brand-name">{product.brand}</p>
             <p className="item-name">{product.name}</p>
-            <p className="item-price">{product.price}</p>
+
+            <p className="item-price">
+              {product.prices.map((price) => {
+                let currentPriceCurrency;
+                if (
+                  price.currency === "AUD" &&
+                  "A" + getSymbolFromCurrency(price.currency) ===
+                    this.props.currency
+                ) {
+                  currentPriceCurrency = this.props.currency + price.amount;
+                } else if (
+                  price.currency !== "AUD" &&
+                  getSymbolFromCurrency(price.currency) === this.props.currency
+                ) {
+                  currentPriceCurrency = this.props.currency + price.amount;
+                }
+                return currentPriceCurrency;
+              })}
+            </p>
 
             {product.attributes &&
               product.attributes.map((attribute) => {
@@ -264,4 +288,17 @@ class Cart extends Component {
     );
   }
 }
-export default Cart;
+const mapStateToProps = (state) => {
+  return {
+    currency: state.currency,
+    orderData: state.orderData,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    saveOrderData: (order) => {
+      dispatch({ type: "SAVE_ORDER_DATA", data: order });
+    },
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Cart);

@@ -1,7 +1,10 @@
-import React, { useState} from "react";
-import { useQuery, gql } from "@apollo/client";
+import React, { Component } from "react";
+import { gql } from "@apollo/client";
 import "./CATEGORY.css";
-import { useHistory } from "react-router-dom";
+import { withRouter } from "react-router-dom";
+import { connect } from 'react-redux';
+
+
 
 const DATA_QUERY = gql`
   query {
@@ -20,16 +23,8 @@ const DATA_QUERY = gql`
     }
   }
 `;
-
-const Category = () => {
-  const { data } = useQuery(DATA_QUERY);
-
-  let history = useHistory();
-  function handleClick(id) {
-    history.push("/women/" + id);
-  }
-
-  const  icon = (<div>
+const icon = (
+  <div>
     <div className="cart-circle" />
     <svg
       className="empty-cart"
@@ -70,64 +65,91 @@ const Category = () => {
         fill="white"
       />
     </svg>
-   </div>);
+  </div>
+);
 
-  
-const [cartState, setCartState] = useState("id");
-
-  let categoryList = [];
-  if (data) {
-    data.categories.forEach((element) => {
-      categoryList.push(
-        <h1 className="category_title">
-          {element.name}
-        </h1>
-      );
-      categoryList.push(
-        element.products.map((item) => {
-          return (
-            <div
-              className="product_list"
-              key={item.id}
-              onMouseEnter={() => {setCartState(item.id)}}
-              onMouseLeave={() => {setCartState("id")}}
-              
-            >
-            
-              <li
-                className="list_wraper"
-                key={item.id}
-                onClick={() => handleClick(item.id)}
-              >
-                
-                {item.inStock ? (
-                  <div>
-                    <img src={item.gallery[0]} alt={item.name} />
-                    {cartState === item.id && icon}
-                  </div>
-                  
-                ) : (
-                  <>
-                    <img src={item.gallery[0]} alt={item.name} />
-                    <div className="overlay">
-                      <p>OUT OF STOCK</p>
-                    </div>
-                  </>
-                )}
-
-                <div className="item_info">
-                  <p className="name">{item.name}</p>
-                  <p className="price">{"$" + item.prices[0].amount}</p>
-                </div>
-              </li>
-            </div>
-          );
-        })
-      );
-    });
+class Category extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      categoryData: undefined,
+      cart: "id"
+    
+    };
   }
-console.log(categoryList)
-  return <div className="category_body">{categoryList}</div>;
-};
+  async componentDidMount() {
+    const { client } = this.props;
+    const { data } = await client.query({ query: DATA_QUERY, variables: {} });
+   
+    let { categories } = data;
+    this.setState({ categoryData: categories});
+  }
 
-export default Category;
+  handleClick(id) {
+    let history = this.props.history;
+    history.push("/women/" + id);
+  }
+  handleMouseEnter(id) {
+    this.setState({ cart: id });
+  }
+  handleMouseLeave() {
+    this.setState({ cart: "id" });
+  }
+
+  render() {
+    const { categoryData } = this.state;
+
+    let categoryList = [];
+    if (categoryData) {
+      categoryData.forEach((element) => {
+        categoryList.push(<h1 className="category_title">{element.name}</h1>);
+
+        categoryList.push(
+          element.products.map((item) => {
+            return (
+              <div
+                className="product_list"
+                key={item.id}
+                onMouseEnter={() => this.handleMouseEnter(item.id)}
+                onMouseLeave={() => this.handleMouseLeave()}
+              >
+                <li
+                  className="list_wraper"
+                  key={item.id}
+                  onClick={() => this.handleClick(item.id)}
+                >
+                  {item.inStock ? (
+                    <div>
+                      <img src={item.gallery[0]} alt={item.name} />
+                      {this.state.cart === item.id && icon}
+                    </div>
+                  ) : (
+                    <>
+                      <img src={item.gallery[0]} alt={item.name} />
+                      <div className="overlay">
+                        <p>OUT OF STOCK</p>
+                      </div>
+                    </>
+                  )}
+
+                  <div className="item_info">
+                    <p className="name">{item.name}</p>
+                    
+                    <p className="price">{this.props.currency + item.prices[0].amount}</p>
+                  </div>
+                </li>
+              </div>
+            );
+          })
+        );
+      });
+    }
+    return <div className="category_body">{categoryList}</div>;
+  }
+}
+const mapStateToProps = (state) => {
+  return{
+    currency: state.currency
+  }
+}
+export default connect(mapStateToProps)(withRouter(Category));

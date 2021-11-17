@@ -1,9 +1,12 @@
 import "./App.css";
 import React, { Component } from "react";
+
+
 import Header from './HEADER/HEADER';
-import CATEGORY from './CATEGORY/CATEGORY';
+import CATEGORY from './CATEGORY/CATEGORYCLASS';
 import PDP from '../src/PDP/PDP'
 import CART from '../src/CART/CART';
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -19,7 +22,7 @@ class App extends Component {
        <Header client={ this.props.client }/>
        <Switch>
           <Route exact path="/">
-          <CATEGORY />
+          <CATEGORY client={ this.props.client }/>
           </Route>
           <Route path="/men">
           <p>Category</p>
