@@ -131,6 +131,10 @@
   order: 3;
   flex-grow: 0;
   margin: 0px 22px;
+  cursor: pointer;
+}
+.basket{
+  cursor: pointer;
 }
 .wheel_two {
   position: absolute;
@@ -138,12 +142,13 @@
   right: 10.61%;
   top: 60%;
   bottom: 4.16%;
+  cursor: pointer;
 }
 .wheel_one {
   position: absolute;
   left: 82.5%;
-
   top: 60%;
+  cursor: pointer;
 }
 /* .currency {
   position: static;

@@ -1,31 +1,33 @@
 import React, { Component } from 'react';
 import { Redirect }  from 'react-router-dom';
+import { connect } from 'react-redux';
 
 
 class Button extends Component{
     state = {
-        redirect: false,
-        prevData: []
+        redirect: false
     }
-clickHandler = (pdpData) => {
-    const { prevData } = this.state;
-     if(pdpData !== prevData){
-        prevData.push(pdpData)
-     
-     }
-     localStorage.setItem('order', JSON.stringify(prevData))
-    this.setState({redirect: true})
- }
- componentDidMount(){
-    const data = localStorage.getItem('order')
-    if(data){
-      const parsedData =JSON.parse(data);
-      this.setState({prevData: parsedData})
-    }
- }
- 
- 
 
+//  componentDidMount(){
+//     const data = localStorage.getItem('order')
+//     if(data){
+//       const parsedData = data ? JSON.parse(data) : [];
+//       this.setState({prevData: parsedData})
+//     }
+//  }
+ clickHandler = (pdpData) => {
+    let storageData = JSON.parse(localStorage.getItem('order')) || [];
+     if(pdpData !== this.props.orderData && pdpData !== storageData ){
+        storageData.push(pdpData)
+        this.props.saveOrderData(storageData);
+        localStorage.setItem('order', JSON.stringify(storageData))
+     }
+     console.log(storageData)
+     console.log(pdpData)
+     console.log(this.props.orderData)
+     this.setState({redirect: true})
+ }
+ 
     render(){
         if(this.state.redirect){
            return <Redirect to="/cart" />
@@ -44,5 +46,17 @@ clickHandler = (pdpData) => {
         )
     }
 }
+const mapStateToProps = (state) => {
+    return{
+        orderData: state.orderData
+    }
+}
 
-export default Button;
+const mapDispatchToProps = (dispatch) => {
+    return{
+        saveOrderData: (order) => {dispatch({type: 'SAVE_ORDER_DATA', data: order})}
+    }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Button);

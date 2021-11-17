@@ -1,8 +1,13 @@
 import React, { Component } from "react";
-import "./PDP.css";
-import { gql} from "@apollo/client";
+import { gql } from "@apollo/client";
 import { withRouter } from "react-router-dom";
+import { connect } from "react-redux";
+import getSymbolFromCurrency from "currency-symbol-map";
+
+import "./PDP.css";
 import Button from "../BUTTON/BUTTON";
+
+
 
 const DATA_QUERY = gql`
   query ($id: String!) {
@@ -61,33 +66,32 @@ class PDP extends Component {
     product = this.extendProduct(product);
     //extend attributes with isSelected option
     product = this.extendAttributes(product);
-
-    this.setState({product: product})
+    this.setState({ product: product });
   }
-
 
   // extendAttributes
   extendAttributes = (product) => {
-   const extendedAttributes = product.attributes.map((attribute) => {
+    const extendedAttributes = product.attributes.map((attribute) => {
       const extendedItems = attribute.items.map((item) => {
-          return { ...item, isSelected: false };
-        });
-        return {...attribute, items: extendedItems}
+        return { ...item, isSelected: false };
+      });
+      return { ...attribute, items: extendedItems };
     });
-    return {...product, attributes: extendedAttributes}
-  }
+    return { ...product, attributes: extendedAttributes };
+  };
 
   //extend  with count property
   extendProduct = (product) => {
     //count is needed for cart
     return { ...product, count: 1, currentPosition: 0 };
-  }
+  };
 
   // handling image hover
   handleClick = (e) => {
-     this.setState({ hoverImage: e });
-     this.setState({ imageClicked: true });
+    this.setState({ hoverImage: e });
+    this.setState({ imageClicked: true });
   };
+  priceHandler() {}
 
   //handling data in state
   attributeHandler = (parentId, attributeId) => {
@@ -96,13 +100,14 @@ class PDP extends Component {
       (parent) => parent.id === parentId
     );
     attributeParent.items.forEach((i) => {
-       i.isSelected = i.id === attributeId;
+      i.isSelected = i.id === attributeId;
     });
     this.setState({ product });
-  }
+  };
 
   render() {
     const { product, imageClicked, hoverImage } = this.state;
+
     const imageList = [];
     if (product) {
       imageList.push(
@@ -167,17 +172,37 @@ class PDP extends Component {
       });
     }
 
-    // let price=[];
-    // if(data){
-    //     data.product.prices.forEach(item => {
-    //         price.push(
-    //             <>
-    //             <p className="price">PRICE:</p>
-    //             <p className="price-currency">{item.currency + item.amount}</p>
-    //           </>
-    //         )
-    //     })
-    // }
+    let price = [];
+    if (product) {
+      product.prices.forEach((item) => {
+        if (
+          item.currency === "AUD" &&
+          "A" + getSymbolFromCurrency(item.currency) === this.props.currency
+        ) {
+          return price.push(
+            <>
+              <p className="price">PRICE:</p>
+              <p className="price-currency">
+                {this.props.currency + item.amount}
+              </p>
+            </>
+          );
+        } else if (
+          item.currency !== "AUD" &&
+          getSymbolFromCurrency(item.currency) === this.props.currency
+        ) {
+          return price.push(
+            <>
+              <p className="price">PRICE:</p>
+              <p className="price-currency">
+                {this.props.currency + item.amount}
+              </p>
+            </>
+          );
+        }
+        return price;
+      });
+    }
 
     return (
       <div className="pdp">
@@ -189,7 +214,7 @@ class PDP extends Component {
               <h3 className="brand">{product.brand}</h3>
               <h5 className="name">{product.name}</h5>
               {renderableAttributes}
-              
+              {price}
               <Button
                 styleButton="button"
                 text="ADD TO CART"
@@ -207,5 +232,10 @@ class PDP extends Component {
     );
   }
 }
+const mapStateToProps = (state) => {
+  return {
+    currency: state.currency,
+  };
+};
 
-export default withRouter(PDP);
+export default connect(mapStateToProps)(withRouter(PDP));

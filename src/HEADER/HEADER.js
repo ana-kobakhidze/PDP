@@ -1,26 +1,49 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
+import { connect } from 'react-redux'
+
 import "./HEADER.css";
 import Currency from '../CURRENCY/CURRENCY';
-import { Link } from "react-router-dom";
 import { TAB_NAMES } from "./Constants";
+import Modal from '../MODAL/MODAL';
+
+
 
 class Header extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeTab: TAB_NAMES.WOMEN,
+      activeTab: TAB_NAMES.WOMEN
+      
     };
 
     this.clickHandler = this.clickHandler.bind(this);
+    this.modalClickHandler = this.modalClickHandler.bind(this);
   }
+//   componentDidMount(){
+    
+//     const orderData = localStorage.getItem('order')
+//     if(orderData){
+//       const order = JSON.parse(orderData);
+//       this.setState({prevData: order})
+//     }
+//  }
 
   clickHandler = (activeTab) => {
     this.setState({ activeTab });
   };
+  modalClickHandler() {
+   
+  if ( this.props.orderData.length > 0 ){
+     return this.props.displayModal();
+   }
+  }
+
 
   render() {
     const { activeTab } = this.state;
     const { client } = this.props;
+    
     return (
       <header className="Header">
         <nav className="Header-Nav">
@@ -133,27 +156,9 @@ class Header extends Component {
         </div>
 
         <div className="actions">
-        {/* <Currency client={client}/> */}
-          {/* <div>
-            <p className="currency">$</p>
-            <svg
-              className="down_arrow"
-              width="8"
-              height="4"
-              viewBox="0 0 8 4"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1 0.5L4 3.5L7 0.5"
-                stroke="black"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div> */}
-          <div className="cart">
-            <svg
+        <Currency client={client}/>
+          <div className="cart" onClick={this.modalClickHandler}>
+            <svg className='basket'
               width="20"
               height="14"
               viewBox="0 0 20 14"
@@ -194,9 +199,22 @@ class Header extends Component {
             </svg>
           </div>
         </div>
+        {this.props.showModal && <Modal /> }
       </header>
     );
   }
 }
+const mapStateToProps = (state) => {
+  return {
+    showModal: state.showModal,
+    orderData: state.orderData
+  }
+}
+const mapDispatchToProps = (dispatch) => {
+  return {
+    displayModal: () => {dispatch({type: "SHOW_MODAL"})}
+  }
+}
 
-export default Header;
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);
