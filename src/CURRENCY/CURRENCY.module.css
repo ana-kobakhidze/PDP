@@ -1,49 +1,42 @@
-.currency {
+.Currency {
   position: absolute;
   width: 12px;
   height: 29px;
   left: 108px;
   top: 6px;
-
   font-family: Raleway;
   font-style: normal;
   font-weight: 500;
   font-size: 18px;
   line-height: 160%;
-
   display: flex;
   align-items: flex-end;
   color: #1d1f22;
-
   flex: none;
   order: 0;
   flex-grow: 0;
   margin: 0px 5px;
 }
-.down_arrow {
+
+.DownArrow {
   position: absolute;
-  left: 67%;
-  right: 20.59%;
+  right: 63px;
   bottom: 18px;
   cursor: pointer;
 }
 
-.dropDown-background {
+.DropDownBackground {
   position: absolute;
   width: 114px;
- 
   top: 42px;
-  left: 101px;
+  left: 93px;
   border-radius: 0.1px;
-
   background: white;
   box-shadow: 0px 4px 35px rgba(168, 172, 176, 0.19); 
-  
-  /* filter: drop-shadow(1px 12px 12px rgb(247, 247, 247)); */
   z-index: 200;
 }
 
-.dropDown-elements {
+.DropDownElements {
 text-align: left;
 cursor: pointer;
 color: #1D1F22;
