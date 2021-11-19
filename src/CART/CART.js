@@ -1,16 +1,19 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import "./CART.css";
+
+import styles from "./CART.module.css";
 import getSymbolFromCurrency from "currency-symbol-map";
 
+//TODO: Think about merging it with Modal.js
 class Cart extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       orderData: [],
     };
 
-    this.clickHandler = this.clickHandler.bind(this);
+    this.attributeSelectionHandler = this.attributeSelectionHandler.bind(this);
     this.incrementHandler = this.incrementHandler.bind(this);
     this.decrementHandler = this.decrementHandler.bind(this);
     this.leftSliderHandler = this.leftSliderHandler.bind(this);
@@ -21,9 +24,23 @@ class Cart extends Component {
     this.setState({ orderData: this.props.orderData });
   }
 
-  clickHandler = (productId, attributeId, itemId) => {
+  //needed because state can be mutated from modal window as well
+  componentDidUpdate(prevProps) {
+    if (prevProps !== this.props) {
+      this.setState({ orderData: this.props.orderData });
+    }
+  }
+
+  saveOrder = (updatedOrderData) => {
+    localStorage.setItem("order", JSON.stringify(updatedOrderData));
+    this.setState({ orderData: updatedOrderData });
+    this.props.saveOrderData(updatedOrderData);
+  };
+
+  attributeSelectionHandler = (productId, attributeId, itemId) => {
     const { orderData } = this.state;
-    const updatedorderData = orderData.map((product) => {
+    //find attribute in object tree, go back and update each node
+    const updatedOrderData = orderData.map((product) => {
       if (product.id === productId) {
         const updatedAttributes = product.attributes.map((attribute) => {
           if (attribute.id === attributeId) {
@@ -40,9 +57,7 @@ class Cart extends Component {
         return { ...product };
       }
     });
-
-    localStorage.setItem("order", JSON.stringify(updatedorderData));
-    this.setState({ orderData: updatedorderData });
+    this.saveOrder(updatedOrderData);
   };
 
   incrementHandler = (id) => {
@@ -54,23 +69,19 @@ class Cart extends Component {
         return { ...product };
       }
     });
-
-    localStorage.setItem("order", JSON.stringify(updatedOrderData));
-    this.setState({ orderData: updatedOrderData });
+    this.saveOrder(updatedOrderData);
   };
 
   decrementHandler = (id) => {
     const { orderData } = this.state;
-    const updatedorderData = orderData.map((product) => {
+    const updatedOrderData = orderData.map((product) => {
       if (product.id === id && product.count > 1) {
         return { ...product, count: product.count - 1 };
       } else {
         return { ...product };
       }
     });
-
-    localStorage.setItem("order", JSON.stringify(updatedorderData));
-    this.setState({ orderData: updatedorderData });
+    this.saveOrder(updatedOrderData);
   };
 
   getProductFromState = (id) => {
@@ -79,21 +90,19 @@ class Cart extends Component {
 
   leftSliderHandler = (id) => {
     const { orderData } = this.state;
-    const updatedorderData = orderData.map((product) => {
+    const updatedOrderData = orderData.map((product) => {
       if (product.id === id && product.currentPosition > 0) {
         return { ...product, currentPosition: product.currentPosition - 1 };
       } else {
         return { ...product };
       }
     });
-
-    localStorage.setItem("order", JSON.stringify(updatedorderData));
-    this.setState({ orderData: updatedorderData });
+    this.saveOrder(updatedOrderData);
   };
 
   rightSliderHandler = (id) => {
     const { orderData } = this.state;
-    const updatedorderData = orderData.map((product) => {
+    const updatedOrderData = orderData.map((product) => {
       if (
         product.id === id &&
         product.currentPosition < product.gallery.length - 2
@@ -103,9 +112,7 @@ class Cart extends Component {
         return { ...product };
       }
     });
-
-    localStorage.setItem("order", JSON.stringify(updatedorderData));
-    this.setState({ orderData: updatedorderData });
+    this.saveOrder(updatedOrderData);
   };
 
   render() {
@@ -113,14 +120,14 @@ class Cart extends Component {
     const { orderData } = this.state;
 
     if (orderData) {
-      orderData.forEach((product) => {
+      orderData.forEach((product, index) => {
         itemList.push(
-          <div className="itemList-wraper" key={product.id}>
+          <div className={styles.ItemListWraper} key={index}>
             <hr />
-            <p className="brand-name">{product.brand}</p>
-            <p className="item-name">{product.name}</p>
+            <p className={styles.BrandName}>{product.brand}</p>
+            <p className={styles.ItemName}>{product.name}</p>
 
-            <p className="item-price">
+            <p className={styles.ItemPrice}>
               {product.prices.map((price) => {
                 let currentPriceCurrency;
                 if (
@@ -142,12 +149,17 @@ class Cart extends Component {
             {product.attributes &&
               product.attributes.map((attribute) => {
                 let attributeRenderableItems = [];
-                const renderableItems = attribute.items.map((item) => {
+                const renderableItems = attribute.items.map((item, index) => {
                   return (
                     <button
-                      className="buttonForAttribute"
+                      key={index}
+                      className={styles.ButtonForAttribute}
                       onClick={() =>
-                        this.clickHandler(product.id, attribute.id, item.id)
+                        this.attributeSelectionHandler(
+                          product.id,
+                          attribute.id,
+                          item.id
+                        )
                       }
                       style={
                         item.value[0] === "#" && !item.isSelected
@@ -163,7 +175,8 @@ class Cart extends Component {
                           : item.value[0] !== "#" && item.isSelected
                           ? {
                               border: "1px solid #808080",
-                              color: "#808080",
+                              color: "#A6A6A6",
+                              background: "#e8e8e8",
                               pointerEvents: "none",
                             }
                           : { border: "1px solid #1d1f22" }
@@ -174,7 +187,7 @@ class Cart extends Component {
                   );
                 });
                 attributeRenderableItems.push(
-                  <div className="category-attributes-wraper">
+                  <div className={styles.CategoryAttributesWraper} key={index}>
                     {renderableItems}
                   </div>
                 );
@@ -182,12 +195,12 @@ class Cart extends Component {
               })}
 
             <button
-              className="plus-box"
+              className={styles.PlusBox}
               onClick={() => this.incrementHandler(product.id)}
             ></button>
 
             <svg
-              className="vertical"
+              className={styles.Vertical}
               width="1"
               height="17"
               viewBox="0 0 1 17"
@@ -202,7 +215,7 @@ class Cart extends Component {
               />
             </svg>
             <svg
-              className="horizontal"
+              className={styles.Horizontal}
               width="17"
               height="1"
               viewBox="0 0 17 1"
@@ -216,13 +229,13 @@ class Cart extends Component {
                 strokeLinejoin="round"
               />
             </svg>
-            <p className="count">{product.count}</p>
+            <p className={styles.Count}>{product.count}</p>
             <button
-              className="minus-box"
+              className={styles.MinusBox}
               onClick={() => this.decrementHandler(product.id)}
             ></button>
             <svg
-              className="horizontal-minus"
+              className={styles.HorizontalMinus}
               width="17"
               height="1"
               viewBox="0 0 17 1"
@@ -237,13 +250,13 @@ class Cart extends Component {
               />
             </svg>
             <img
-              className="product-image"
+              className={styles.ProductImage}
               src={product.gallery[product.currentPosition]}
               alt="product"
             />
             <svg
               onClick={() => this.leftSliderHandler(product.id)}
-              className="left-arrow"
+              className={styles.LeftArrow}
               width="8"
               height="14"
               viewBox="0 0 8 14"
@@ -259,7 +272,7 @@ class Cart extends Component {
               />
             </svg>
             <svg
-              className="right-arrow"
+              className={styles.RightArrow}
               onClick={() => this.rightSliderHandler(product.id)}
               width="8"
               height="14"
@@ -282,7 +295,7 @@ class Cart extends Component {
 
     return (
       <div>
-        <h1 className="cart-title">CART</h1>
+        <h1 className={styles.CartTitle}>CART</h1>
         {itemList}
       </div>
     );

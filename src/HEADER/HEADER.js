@@ -1,58 +1,81 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { connect } from 'react-redux'
+import { connect } from "react-redux";
 
-import "./HEADER.css";
-import Currency from '../CURRENCY/CURRENCY';
-import { TAB_NAMES } from "./Constants";
-import Modal from '../MODAL/MODAL';
-
-
+import styles from "./HEADER.module.css";
+import Currency from "../CURRENCY/CURRENCY";
+import { TAB_NAMES } from "../Constants";
+import Modal from "../MODAL/MODAL";
 
 class Header extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      activeTab: TAB_NAMES.WOMEN
-      
+      activeTab: TAB_NAMES.WOMEN,
+      orderData: [],
     };
 
-    this.clickHandler = this.clickHandler.bind(this);
+    this.tabClickHandler = this.tabClickHandler.bind(this);
     this.modalClickHandler = this.modalClickHandler.bind(this);
   }
-//   componentDidMount(){
-    
-//     const orderData = localStorage.getItem('order')
-//     if(orderData){
-//       const order = JSON.parse(orderData);
-//       this.setState({prevData: order})
-//     }
-//  }
 
-  clickHandler = (activeTab) => {
-    this.setState({ activeTab });
-  };
-  modalClickHandler() {
-   
-  if ( this.props.orderData.length > 0 ){
-     return this.props.displayModal();
-   }
+  componentDidMount() {
+    this.setState({ orderData: this.props.orderData });
   }
 
+  saveOrder(updatedOrder){
+    this.setState({ orderData: updatedOrder });
+    localStorage.setItem("order", JSON.stringify(updatedOrder));
+    this.props.saveOrderData(updatedOrder);
+  }
+
+  componentDidUpdate(prevProps) {
+    let updatedOrder = this.props.orderData;
+    if (prevProps !== this.props) {
+      this.saveOrder(updatedOrder);
+    }
+  }
+
+  tabClickHandler = (activeTab) => {
+    this.setState({ activeTab });
+  };
+
+  modalClickHandler() {
+    if (this.props.orderData.length > 0) {
+      return this.props.displayModal();
+    }
+  }
 
   render() {
-    const { activeTab } = this.state;
+    const { activeTab, orderData } = this.state;
     const { client } = this.props;
-    
+
+    let productQuantityInOrder = [];
+    if (orderData) {
+      orderData.map((product) => {
+        return productQuantityInOrder.push(product.count);
+      });
+    }
+    let orderQuantity = "";
+    if (productQuantityInOrder.length > 0) {
+      const reducer = (accumulator, productQuantityInOrder) =>
+        accumulator + productQuantityInOrder;
+      const totalNumber = productQuantityInOrder.reduce(reducer);
+      orderQuantity = totalNumber.toString();
+    }
+
     return (
-      <header className="Header">
-        <nav className="Header-Nav">
+      <header className={styles.Header}>
+        <nav className={styles.HeaderNav}>
           <div>
             <Link
               to="/"
-              className={activeTab !== TAB_NAMES.WOMEN ? "link" : "clickedLink"}
+              className={
+                activeTab !== TAB_NAMES.WOMEN ? styles.Link : styles.ClickedLink
+              }
               onClick={() => {
-                this.clickHandler(TAB_NAMES.WOMEN);
+                this.tabClickHandler(TAB_NAMES.WOMEN);
               }}
             >
               WOMEN
@@ -62,9 +85,9 @@ class Header extends Component {
           <div>
             <Link
               to="/men"
-              className={activeTab !== TAB_NAMES.MEN ? "link" : "clickedLink"}
+              className={activeTab !== TAB_NAMES.MEN ? styles.Link : styles.ClickedLink}
               onClick={() => {
-                this.clickHandler(TAB_NAMES.MEN);
+                this.tabClickHandler(TAB_NAMES.MEN);
               }}
             >
               MEN
@@ -74,9 +97,9 @@ class Header extends Component {
           <div>
             <Link
               to="/kids"
-              className={activeTab !== TAB_NAMES.KIDS ? "link" : "clickedLink"}
+              className={activeTab !== TAB_NAMES.KIDS ? styles.Link : styles.ClickedLink}
               onClick={() => {
-                this.clickHandler(TAB_NAMES.KIDS);
+                this.tabClickHandler(TAB_NAMES.KIDS);
               }}
             >
               KIDS
@@ -84,9 +107,9 @@ class Header extends Component {
           </div>
         </nav>
 
-        <div className="brand_icon">
+        <div className={styles.BrandIcon}>
           <svg
-            className="icon_back"
+            className={styles.IconBack}
             width="29"
             height="25"
             viewBox="0 0 29 25"
@@ -100,7 +123,7 @@ class Header extends Component {
           </svg>
 
           <svg
-            className="icon_front"
+            className={styles.IconFront}
             width="33"
             height="30"
             viewBox="0 0 33 30"
@@ -127,7 +150,7 @@ class Header extends Component {
           </svg>
 
           <svg
-            className="icon_arrow"
+            className={styles.IconArrow}
             width="15"
             height="10"
             viewBox="0 0 15 10"
@@ -141,7 +164,7 @@ class Header extends Component {
           </svg>
 
           <svg
-            className="icon_arrow-head"
+            className={styles.IconArrowHead}
             width="7"
             height="5"
             viewBox="0 0 7 5"
@@ -155,10 +178,11 @@ class Header extends Component {
           </svg>
         </div>
 
-        <div className="actions">
-        <Currency client={client}/>
-          <div className="cart" onClick={this.modalClickHandler}>
-            <svg className='basket'
+        <div className={styles.Actions}>
+          <Currency client={client} />
+          <div className={styles.Cart} onClick={this.modalClickHandler}>
+            <svg
+              className={styles.Basket}
               width="20"
               height="14"
               viewBox="0 0 20 14"
@@ -171,7 +195,7 @@ class Header extends Component {
               />
             </svg>
             <svg
-              className="wheel_one"
+              className={styles.WheelOne}
               width="5"
               height="6"
               viewBox="0 0 5 6"
@@ -185,7 +209,7 @@ class Header extends Component {
             </svg>
 
             <svg
-              className="wheel_two"
+              className={styles.WheelTwo}
               width="5"
               height="6"
               viewBox="0 0 5 6"
@@ -198,8 +222,18 @@ class Header extends Component {
               />
             </svg>
           </div>
+
+          {orderQuantity >= 1 && (
+            <div className={styles.ProductCounter}>
+              {orderQuantity.length === 1 ? (
+                <p className={styles.NumberOfCounter}>{orderQuantity}</p>
+              ) : (
+                <p className={styles.NumberOfCounterPosition}>{orderQuantity}</p>
+              )}
+            </div>
+          )}
         </div>
-        {this.props.showModal && <Modal /> }
+        {this.props.showModal && <Modal orderQuantity={orderQuantity} />}
       </header>
     );
   }
@@ -207,14 +241,18 @@ class Header extends Component {
 const mapStateToProps = (state) => {
   return {
     showModal: state.showModal,
-    orderData: state.orderData
-  }
-}
+    orderData: state.orderData,
+  };
+};
 const mapDispatchToProps = (dispatch) => {
   return {
-    displayModal: () => {dispatch({type: "SHOW_MODAL"})}
-  }
-}
-
+    displayModal: () => {
+      dispatch({ type: "SHOW_MODAL" });
+    },
+    saveOrderData: (order) => {
+      dispatch({ type: "SAVE_ORDER_DATA", data: order });
+    },
+  };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

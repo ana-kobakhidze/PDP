@@ -1,10 +1,9 @@
-.cart-title {
+.CartTitle {
   position: absolute;
   width: 84px;
   height: 40px;
   left: 100px;
   top: 160px;
-
   font-family: Raleway;
   font-style: normal;
   font-weight: bold;
@@ -14,7 +13,7 @@
   color: #1d1f22;
 }
 
-hr {
+.Hr {
   position: relative;
   width: 1217px;
   height: 1px;
@@ -23,7 +22,7 @@ hr {
   background: #e5e5e5;
 }
 
-.itemList-wraper {
+.ItemListWraper {
   position: relative;
   left: 102px;
   top: 237px;
@@ -31,61 +30,54 @@ hr {
   height: 360px;
 }
 
-.brand-name {
+.BrandName {
   width: 292px;
   height: 27px;
   left: 101px;
   top: 280px;
-
   font-family: Raleway;
   font-style: normal;
   font-weight: 600;
   font-size: 30px;
   line-height: 27px;
-
-
   display: flex;
   align-items: center;
   color: #1d1f22;
 }
 
-.item-name {
+.ItemName {
   position: absolute;
   width: 400px;
   height: 27px;
   left: 0px;
   top: 50px;
-
   font-family: Raleway;
   font-style: normal;
   font-weight: normal;
   font-size: 30px;
   line-height: 27px;
-
   display: flex;
   align-items: center;
   color: #1d1f22;
 }
 
-.item-price {
+.ItemPrice {
   position: absolute;
   width: 86px;
   height: 46px;
   left: 0px;
   top: 89px;
-
   font-family: Raleway;
   font-style: normal;
   font-weight: bold;
   font-size: 24px;
   line-height: 18px;
-
   display: flex;
   align-items: center;
   color: #1d1f22;
 }
 
-.plus-box {
+.PlusBox {
   height: 45px;
   width: 45px;
   position: absolute;
@@ -96,21 +88,21 @@ hr {
   box-sizing: border-box;
   cursor: pointer;
 }
-.vertical {
+.Vertical {
   position: absolute;
   right: 180px;
   top: 39px;
   border: 1px solid #1d1f22;
 }
 
-.horizontal {
+.Horizontal {
   position: absolute;
   left: 1027px;
   top: 46px;
   border: 1px solid #1d1f22;
 }
 
-.count {
+.Count {
   position: absolute;
   left: 1029px;
   top: 74px;
@@ -122,7 +114,7 @@ hr {
   color: #1d1f22;
 }
 
-.minus-box {
+.MinusBox {
   height: 45px;
   width: 45px;
   border-radius: 0px;
@@ -135,13 +127,13 @@ hr {
   cursor: pointer;
 }
 
-.horizontal-minus {
+.HorizontalMinus {
   position: absolute;
   left: 1029px;
   top: 186px;
   border: 1px solid #1d1f22;
 }
-.product-image {
+.ProductImage {
   height: 185px;
   width: 141px;
   position: absolute;
@@ -151,21 +143,21 @@ hr {
   object-position: 70% 100%;
 }
 
-.left-arrow {
+.LeftArrow {
   position: absolute;
   left: 1088px;
   top: 112px;
   cursor: pointer;
 }
 
-.right-arrow {
+.RightArrow {
   position: absolute;
   left: 1197px;
   top: 112px;
   cursor: pointer;
 }
 
-.category-attributes-wraper {
+.CategoryAttributesWraper {
   display: flex;
   flex-direction: row;
   height: 57px;
@@ -174,14 +166,15 @@ hr {
   justify-content: flex-start;
 }
 
-.buttonForAttribute {
+.ButtonForAttribute {
   margin-right: 30px;
   width: 66px;
   height: 45px;
   background-color: white;
 }
-.buttonForAttribute:hover {
+.ButtonForAttribute:hover {
   background-color: black;
   color: white;
   cursor: pointer;
 }
+

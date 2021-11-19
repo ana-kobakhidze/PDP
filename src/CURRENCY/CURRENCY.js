@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { gql } from "@apollo/client";
 import { connect } from "react-redux";
 
-import "./CURRENCY.css";
+import styles from "./CURRENCY.module.css";
 import getSymbolFromCurrency from "currency-symbol-map";
 
 const DATA_QUERY = gql`
@@ -56,7 +56,7 @@ class Currency extends Component {
       currencies.map((element, index) => {
         return dropDown.push(
           <p
-            className="dropDown-elements"
+            className={styles.DropDownElements}
             key={index}
             onClick={() => this.clickedCurrencyHandler(element)}
           >
@@ -69,12 +69,12 @@ class Currency extends Component {
 
     return (
       <div>
-        <p className="currency">{this.props.currency}</p>
+        <p className={styles.Currency}>{this.props.currency}</p>
         <svg
           onClick={this.arrowClickHandler}
-          className="down_arrow"
-          width="8"
-          height="4"
+          className={styles.DownArrow}
+          width="9"
+          height="5"
           viewBox="0 0 8 4"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -86,7 +86,7 @@ class Currency extends Component {
             strokeLinejoin="round"
           />
         </svg>
-        <div className="dropDown-background">{dropDown}</div>
+        <div className={styles.DropDownBackground}>{dropDown}</div>
       </div>
     );
   }
@@ -101,7 +101,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     currentCurrencyIcon: (id) => {
       dispatch({ type: "CHANGE_ICON", id: id });
-    }
+    },
   };
 };
 

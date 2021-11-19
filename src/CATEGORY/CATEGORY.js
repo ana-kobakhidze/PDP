@@ -1,7 +1,11 @@
-import React, { useState} from "react";
-import { useQuery, gql } from "@apollo/client";
-import "./CATEGORY.css";
-import { useHistory } from "react-router-dom";
+import React, { Component } from "react";
+import { gql } from "@apollo/client";
+
+import styles from "./CATEGORY.module.css";
+import { withRouter } from "react-router-dom";
+import { connect } from "react-redux";
+
+import { TAB_NAMES } from "../Constants";
 
 const DATA_QUERY = gql`
   query {
@@ -20,19 +24,11 @@ const DATA_QUERY = gql`
     }
   }
 `;
-
-const Category = () => {
-  const { data } = useQuery(DATA_QUERY);
-
-  let history = useHistory();
-  function handleClick(id) {
-    history.push("/women/" + id);
-  }
-
-  const  icon = (<div>
-    <div className="cart-circle" />
+const icon = (
+  <div>
+    <div className={styles.CartCircle} />
     <svg
-      className="empty-cart"
+      className={styles.EmptyCart}
       width="24"
       height="17"
       viewBox="0 0 24 17"
@@ -45,7 +41,7 @@ const Category = () => {
       />
     </svg>
     <svg
-      className="cart-wheel-one"
+      className={styles.CartWheelOne}
       width="6"
       height="7"
       viewBox="0 0 6 7"
@@ -58,7 +54,7 @@ const Category = () => {
       />
     </svg>
     <svg
-      className="cart-wheel-two"
+      className={styles.CartWheelTwo}
       width="6"
       height="7"
       viewBox="0 0 6 7"
@@ -70,64 +66,96 @@ const Category = () => {
         fill="white"
       />
     </svg>
-   </div>);
+  </div>
+);
 
-  
-const [cartState, setCartState] = useState("id");
-
-  let categoryList = [];
-  if (data) {
-    data.categories.forEach((element) => {
-      categoryList.push(
-        <h1 className="category_title">
-          {element.name}
-        </h1>
-      );
-      categoryList.push(
-        element.products.map((item) => {
-          return (
-            <div
-              className="product_list"
-              key={item.id}
-              onMouseEnter={() => {setCartState(item.id)}}
-              onMouseLeave={() => {setCartState("id")}}
-              
-            >
-            
-              <li
-                className="list_wraper"
-                key={item.id}
-                onClick={() => handleClick(item.id)}
-              >
-                
-                {item.inStock ? (
-                  <div>
-                    <img src={item.gallery[0]} alt={item.name} />
-                    {cartState === item.id && icon}
-                  </div>
-                  
-                ) : (
-                  <>
-                    <img src={item.gallery[0]} alt={item.name} />
-                    <div className="overlay">
-                      <p>OUT OF STOCK</p>
-                    </div>
-                  </>
-                )}
-
-                <div className="item_info">
-                  <p className="name">{item.name}</p>
-                  <p className="price">{"$" + item.prices[0].amount}</p>
-                </div>
-              </li>
-            </div>
-          );
-        })
-      );
-    });
+class Category extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      categoryData: undefined,
+      cart: "id",
+    };
   }
-console.log(categoryList)
-  return <div className="category_body">{categoryList}</div>;
-};
+  async componentDidMount() {
+    const { client } = this.props;
+    const { data } = await client.query({ query: DATA_QUERY, variables: {} });
 
-export default Category;
+    let { categories } = data;
+    this.setState({ categoryData: categories });
+  }
+
+  handleClick(id) {
+    let history = this.props.history;
+    history.push("/" + TAB_NAMES.WOMEN + "/" + id);
+  }
+  handleMouseEnter(id) {
+    this.setState({ cart: id });
+  }
+  handleMouseLeave() {
+    this.setState({ cart: "id" });
+  }
+
+  render() {
+    const { categoryData } = this.state;
+
+    let categoryList = [];
+    if (categoryData) {
+      categoryData.forEach((element, index) => {
+        categoryList.push(
+          <h1 className={styles.CategoryTitle} key={index}>
+            {element.name}
+          </h1>
+        );
+
+        categoryList.push(
+          element.products.map((item, index) => {
+            return (
+              <div
+                className={styles.ProductList}
+                key={index}
+                onMouseEnter={() => this.handleMouseEnter(item.id)}
+                onMouseLeave={() => this.handleMouseLeave()}
+              >
+                <li
+                  className={styles.ListWraper}
+                  key={item.id}
+                  onClick={() => this.handleClick(item.id)}
+                >
+                  {item.inStock ? (
+                    <div>
+                      <img src={item.gallery[0]} alt={item.name} />
+                      {this.state.cart === item.id && icon}
+                    </div>
+                  ) : (
+                    <>
+                      <img src={item.gallery[0]} alt={item.name} />
+                      <div className={styles.Overlay}>
+                        <p>OUT OF STOCK</p>
+                      </div>
+                    </>
+                  )}
+
+                  <div className={styles.ItemInfo}>
+                    <p className={styles.Name}>{item.name}</p>
+
+                    <p className={styles.Price}>
+                      {this.props.currency + item.prices[0].amount}
+                    </p>
+                  </div>
+                </li>
+              </div>
+            );
+          })
+        );
+      });
+    }
+    return <div className={styles.CategoryBody}>{categoryList}</div>;
+  }
+}
+const mapStateToProps = (state) => {
+  return {
+    currency: state.currency,
+  };
+};
+export default connect(mapStateToProps)(withRouter(Category));
