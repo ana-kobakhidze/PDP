@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
 class Button extends Component {
@@ -12,7 +13,8 @@ class Button extends Component {
     const storedProductIndex = storedOrder.findIndex(
       (p) => p.id === pdpData.id
     );
-    if (storedProductIndex === -1) {
+
+    if (storedProductIndex === -1 && pdpData) {
       storedOrder.push(pdpData);
     } else {
       storedOrder[storedProductIndex] = pdpData;
@@ -20,11 +22,14 @@ class Button extends Component {
     this.props.saveOrderData(storedOrder);
     localStorage.setItem("order", JSON.stringify(storedOrder));
     this.setState({ redirect: true });
+    this.props.currentCartClick("ADD_TO_CART");
+    let history = this.props.history;
+    history.push("/cart");
   };
 
   render() {
     if (this.state.redirect) {
-      return <Redirect to="/cart" />;
+      return <Redirect push to="/cart" />;
     }
     return (
       <button
@@ -47,7 +52,9 @@ const mapDispatchToProps = (dispatch) => {
     saveOrderData: (order) => {
       dispatch({ type: "SAVE_ORDER_DATA", data: order });
     },
+    currentCartClick: (event) =>
+      dispatch({ type: "SAVE_CARTICON_CLICK", clicked: event }),
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Button);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Button));

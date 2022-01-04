@@ -37,6 +37,7 @@
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-start;
+  z-index: 0;
 }
 .ListWraper .image_inStock .image_outOfStock {
   padding: 10px;
@@ -69,8 +70,12 @@
   font-size: 24px;
   line-height: 160%;
 }
+.CartIcon :last-child {
+  z-index: 1;
+}
 
 .CartCircle {
+  z-index: 1;
   filter: drop-shadow(0px 4px 11px rgba(29, 31, 34, 0.1));
   position: absolute;
   height: 52px;
@@ -82,17 +87,20 @@
   border-radius: 50px;
 }
 .EmptyCart {
+  z-index: 2;
   height: 15.6px;
   position: absolute;
   left: 293px;
   top: 319px;
 }
 .CartWheelOne {
+  z-index: 2;
   position: absolute;
   left: 300px;
   top: 335px;
 }
 .CartWheelTwo {
+  z-index: 2;
   position: absolute;
   left: 309px;
   top: 335px;
@@ -102,6 +110,15 @@
   display: flex;
   flex-direction: column;
 }
+.ItemInfo .Brand {
+  font-family: Raleway;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 160%;
+  padding: 0 10px;
+  margin: 0;
+}
 .ItemInfo .Name {
   font-family: Raleway;
   font-style: normal;
@@ -110,8 +127,8 @@
   line-height: 160%;
   padding: 0 10px;
   margin: 0;
-  margin-top: 15px;
 }
+
 .ItemInfo .Price {
   font-family: Raleway;
   font-style: normal;

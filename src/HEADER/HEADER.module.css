@@ -9,48 +9,6 @@
   top: 0px;
 }
 
-.HeaderNav {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0px;
-  position: absolute;
-  width: 234px;
-  height: 56px;
-  left: 101px;
-  bottom: 0px;
-}
-
-.Link {
-  padding: 0 20px;
-  text-decoration: none;
-  font-family: Raleway;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 16px;
-  line-height: 120%;
-  color: #1d1f22;
-}
-
-.Link:hover {
-  cursor: pointer;
-  color: #5ece7b;
-}
-
-.ClickedLink {
-  padding: 0 20px;
-  text-decoration: none;
-  font-family: Raleway;
-  font-style: normal;
-  font-size: 16px;
-  line-height: 120%;
-  color: #5ece7b;
-  font-weight: 500;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #5ece7b;
-}
-
 .BrandIcon {
   width: 41px;
   height: 41px;
@@ -111,8 +69,8 @@
   position: static;
   width: 20px;
   height: 20px;
-  right: 0px;
-  top: calc(50% - 20px / 2);
+  right: 1px;
+  top: -20px;
   flex: none;
   order: 3;
   flex-grow: 0;
@@ -145,6 +103,7 @@
   position: absolute;
   top: 4px;
   left: 176px;
+  cursor: pointer;
 }
 .NumberOfCounter {
   position: absolute;

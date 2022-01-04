@@ -8,7 +8,6 @@ import getSymbolFromCurrency from "currency-symbol-map";
 class Cart extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       orderData: [],
     };
@@ -23,7 +22,6 @@ class Cart extends Component {
   componentDidMount() {
     this.setState({ orderData: this.props.orderData });
   }
-
   //needed because state can be mutated from modal window as well
   componentDidUpdate(prevProps) {
     if (prevProps !== this.props) {
@@ -114,6 +112,11 @@ class Cart extends Component {
     });
     this.saveOrder(updatedOrderData);
   };
+  deleteButtonHandler = (id) => {
+    const { orderData } = this.state;
+    const newArr = orderData.filter((item) => item.id !== id);
+    this.saveOrder(newArr);
+  };
 
   render() {
     let itemList = [];
@@ -122,172 +125,198 @@ class Cart extends Component {
     if (orderData) {
       orderData.forEach((product, index) => {
         itemList.push(
-          <div className={styles.ItemListWraper} key={index}>
-            <hr />
-            <p className={styles.BrandName}>{product.brand}</p>
-            <p className={styles.ItemName}>{product.name}</p>
+          <div key={index}>
+            <div className={styles.ItemListWraper}>
+              <hr />
+              <p className={styles.BrandName}>{product.brand}</p>
+              <p className={styles.ItemName}>{product.name}</p>
 
-            <p className={styles.ItemPrice}>
-              {product.prices.map((price) => {
-                let currentPriceCurrency;
-                if (
-                  price.currency === "AUD" &&
-                  "A" + getSymbolFromCurrency(price.currency) ===
-                    this.props.currency
-                ) {
-                  currentPriceCurrency = this.props.currency + price.amount;
-                } else if (
-                  price.currency !== "AUD" &&
-                  getSymbolFromCurrency(price.currency) === this.props.currency
-                ) {
-                  currentPriceCurrency = this.props.currency + price.amount;
-                }
-                return currentPriceCurrency;
-              })}
-            </p>
+              <p className={styles.ItemPrice}>
+                {product.prices.map((price) => {
+                  let currentPriceCurrency;
+                  if (
+                    price.currency === "AUD" &&
+                    "A" + getSymbolFromCurrency(price.currency) ===
+                      this.props.currency
+                  ) {
+                    currentPriceCurrency = this.props.currency + price.amount;
+                  } else if (
+                    price.currency !== "AUD" &&
+                    getSymbolFromCurrency(price.currency) ===
+                      this.props.currency
+                  ) {
+                    currentPriceCurrency = this.props.currency + price.amount;
+                  }
+                  return currentPriceCurrency;
+                })}
+              </p>
 
-            {product.attributes &&
-              product.attributes.map((attribute) => {
-                let attributeRenderableItems = [];
-                const renderableItems = attribute.items.map((item, index) => {
-                  return (
-                    <button
+              {product.attributes &&
+                product.attributes.map((attribute) => {
+                  let attributeRenderableItems = [];
+                  const renderableItems = attribute.items.map((item, index) => {
+                    return item.isSelected ? (
+                      <button
+                        key={index}
+                        className={
+                          item.value[0] !== "#"
+                            ? styles.SelectedAttrBox
+                            : styles.colorAttrBox
+                        }
+                        onClick={() =>
+                          this.attributeSelectionHandler(
+                            product.id,
+                            attribute.id,
+                            item.id
+                          )
+                        }
+                        style={{ backgroundColor: item.value }}
+                      >
+                        {item.value[0] === "#" ? null : item.value}
+                      </button>
+                    ) : (
+                      <button
+                        key={index}
+                        className={
+                          item.value[0] === "#"
+                            ? styles.ColorAttrBoxSelected
+                            : styles.attributeBoxOrg
+                        }
+                        onClick={() =>
+                          this.attributeSelectionHandler(
+                            product.id,
+                            attribute.id,
+                            item.id
+                          )
+                        }
+                        style={{ backgroundColor: item.value }}
+                      >
+                        {item.value[0] === "#" ? null : item.value}
+                      </button>
+                    );
+                  });
+                  attributeRenderableItems.push(
+                    <div
+                      className={styles.CategoryAttributesWraper}
                       key={index}
-                      className={styles.ButtonForAttribute}
-                      onClick={() =>
-                        this.attributeSelectionHandler(
-                          product.id,
-                          attribute.id,
-                          item.id
-                        )
-                      }
-                      style={
-                        item.value[0] === "#" && !item.isSelected
-                          ? {
-                              background: item.value,
-                              border: "1px solid #1d1f22",
-                            }
-                          : item.value[0] === "#" && item.isSelected
-                          ? {
-                              border: "2px solid #1d1f22",
-                              background: item.value,
-                            }
-                          : item.value[0] !== "#" && item.isSelected
-                          ? {
-                              border: "1px solid #808080",
-                              color: "#A6A6A6",
-                              background: "#e8e8e8",
-                              pointerEvents: "none",
-                            }
-                          : { border: "1px solid #1d1f22" }
-                      }
                     >
-                      {item.value[0] === "#" ? null : item.value}
-                    </button>
+                      <p className={styles.AttributesName}>
+                        {attribute.name.toUpperCase() + ":"}
+                      </p>
+                      {renderableItems}
+                    </div>
                   );
-                });
-                attributeRenderableItems.push(
-                  <div className={styles.CategoryAttributesWraper} key={index}>
-                    {renderableItems}
-                  </div>
-                );
-                return attributeRenderableItems;
-              })}
+                  return attributeRenderableItems;
+                })}
 
-            <button
-              className={styles.PlusBox}
-              onClick={() => this.incrementHandler(product.id)}
-            ></button>
+              <button
+                className={styles.PlusBox}
+                onClick={() => this.incrementHandler(product.id)}
+              ></button>
 
-            <svg
-              className={styles.Vertical}
-              width="1"
-              height="17"
-              viewBox="0 0 1 17"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M0.5 1V16"
-                stroke="#1D1F22"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+              <svg
+                className={styles.Vertical}
+                width="1"
+                height="17"
+                viewBox="0 0 1 17"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M0.5 1V16"
+                  stroke="#1D1F22"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <svg
+                className={styles.Horizontal}
+                width="17"
+                height="1"
+                viewBox="0 0 17 1"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 0.5H16"
+                  stroke="#1D1F22"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <p className={styles.Count}>{product.count}</p>
+              <button
+                className={styles.MinusBox}
+                onClick={() => this.decrementHandler(product.id)}
+              ></button>
+              <svg
+                className={styles.HorizontalMinus}
+                width="17"
+                height="1"
+                viewBox="0 0 17 1"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 0.5H16"
+                  stroke="#1D1F22"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+
+              <img
+                className={styles.ProductImage}
+                src={product.gallery[product.currentPosition]}
+                alt="product"
               />
-            </svg>
-            <svg
-              className={styles.Horizontal}
-              width="17"
-              height="1"
-              viewBox="0 0 17 1"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1 0.5H16"
-                stroke="#1D1F22"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <p className={styles.Count}>{product.count}</p>
+
+              {product.gallery.length > 1 && (
+                <svg
+                  onClick={() => this.leftSliderHandler(product.id)}
+                  className={styles.LeftArrow}
+                  width="8"
+                  height="14"
+                  viewBox="0 0 8 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M7 13L1 7L7 1"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+
+              {product.gallery.length > 1 && (
+                <svg
+                  className={styles.RightArrow}
+                  onClick={() => this.rightSliderHandler(product.id)}
+                  width="8"
+                  height="14"
+                  viewBox="0 0 8 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1 13L7 7L1 1"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </div>
             <button
-              className={styles.MinusBox}
-              onClick={() => this.decrementHandler(product.id)}
-            ></button>
-            <svg
-              className={styles.HorizontalMinus}
-              width="17"
-              height="1"
-              viewBox="0 0 17 1"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+              className={styles.DeleteButton}
+              onClick={() => this.deleteButtonHandler(product.id)}
             >
-              <path
-                d="M1 0.5H16"
-                stroke="#1D1F22"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <img
-              className={styles.ProductImage}
-              src={product.gallery[product.currentPosition]}
-              alt="product"
-            />
-            <svg
-              onClick={() => this.leftSliderHandler(product.id)}
-              className={styles.LeftArrow}
-              width="8"
-              height="14"
-              viewBox="0 0 8 14"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M7 13L1 7L7 1"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <svg
-              className={styles.RightArrow}
-              onClick={() => this.rightSliderHandler(product.id)}
-              width="8"
-              height="14"
-              viewBox="0 0 8 14"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1 13L7 7L1 1"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+              X
+            </button>
           </div>
         );
       });

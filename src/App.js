@@ -1,14 +1,17 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
+import { connect } from "react-redux";
 import "./App.css";
 
 import Header from "./HEADER/HEADER";
 import CATEGORY from "./CATEGORY/CATEGORY";
 import PDP from "../src/PDP/PDP";
 import CART from "../src/CART/CART";
-
-import { TAB_NAMES } from "./Constants";
 
 class App extends Component {
   render() {
@@ -17,22 +20,39 @@ class App extends Component {
         <div className="app">
           <Header client={this.props.client} />
           <Switch>
-            <Route exact path="/">
-              <CATEGORY client={this.props.client} />
-            </Route>
-            <Route path={"/" + TAB_NAMES.MEN}></Route>
-            <Route path={"/" + TAB_NAMES.KIDS}></Route>
-            <Route path={"/" + TAB_NAMES.WOMEN}>
-              <PDP client={this.props.client} />
-            </Route>
-            <Route path="/cart">
-              <CART />
-            </Route>
+            <Route
+              path="/"
+              render={() => {
+                return this.props.cartClick === "" ||
+                  this.props.cartClick === "TAB_IS_CLICKED" ? (
+                  ((<Redirect to={"/" + this.props.tabName} />),
+                  (<CATEGORY client={this.props.client} />))
+                )  : this.props.cartClick === "ADD_TO_CART" ||
+                    this.props.cartClick === "CART_ICON" ? (
+                  ((<Redirect to="/cart" />), (<CART />))
+                ) : this.props.cartClick === "PRODUCT_PAGE" ? (
+                  ((<Redirect
+                      to={"/" + this.props.tabName + this.props.productId}
+                    />
+                  ),
+                  (<PDP client={this.props.client} />))
+                )
+                : (
+                  <CATEGORY client={this.props.client} />
+                );
+              }}
+            />
           </Switch>
         </div>
       </Router>
     );
   }
 }
-
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    tabName: state.tabName,
+    productId: state.productId,
+    cartClick: state.cartClick,
+  };
+};
+export default connect(mapStateToProps)(App);

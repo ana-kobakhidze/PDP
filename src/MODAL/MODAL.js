@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";
+import { Redirect } from "react-router-dom";
 import styles from "./MODAL.module.css";
 import getSymbolFromCurrency from "currency-symbol-map";
 
@@ -23,6 +23,14 @@ class Modal extends Component {
 
   componentDidMount() {
     this.setState({ orderData: this.props.orderData });
+  }
+  componentDidUpdate() {
+    const { redirect } = this.state;
+    if (redirect) {
+      this.closeModal();
+      this.props.currentCartClick("ADD_TO_CART");
+      return <Redirect push to="/cart" />;
+    }
   }
 
   saveOrder = (updatedOrderData) => {
@@ -113,16 +121,16 @@ class Modal extends Component {
     this.saveOrder(updatedOrderData);
   };
 
+  closeModal = () => {
+    this.props.displayModal(false);
+    this.props.disableCurrencyButton(false);
+  };
+
   redirectButtonHandler = () => {
-    const { redirect } = this.state;
-    this.setState({ redirect: !redirect });
+    this.setState({ redirect: true });
   };
 
   render() {
-    const { redirect } = this.state;
-    if (redirect) {
-      return <Redirect to="/cart" />;
-    }
     let itemList = [];
     const { orderData } = this.state;
 
@@ -156,10 +164,14 @@ class Modal extends Component {
               product.attributes.map((attribute) => {
                 let attributeRenderableItems = [];
                 const renderableItems = attribute.items.map((item, index) => {
-                  return (
+                  return item.isSelected ? (
                     <button
                       key={index}
-                      className={styles.AttributeButton}
+                      className={
+                        item.value[0] !== "#"
+                          ? styles.SelectedAttributeButton
+                          : styles.ColorAttributeBox
+                      }
                       onClick={() =>
                         this.attributeSelectionHandler(
                           product.id,
@@ -167,28 +179,26 @@ class Modal extends Component {
                           item.id
                         )
                       }
-                      style={
-                        item.value[0] === "#" && !item.isSelected
-                          ? {
-                              background: item.value,
-                              border: "1px solid #1d1f22",
-                              width: "24px",
-                            }
-                          : item.value[0] === "#" && item.isSelected
-                          ? {
-                              border: "2px solid #1d1f22",
-                              background: item.value,
-                              width: "24px",
-                            }
-                          : item.value[0] !== "#" && item.isSelected
-                          ? {
-                              border: "1px solid #808080",
-                              color: "#A6A6A6",
-                              background: "#e8e8e8",
-                              pointerEvents: "none",
-                            }
-                          : { border: "1px solid #1d1f22" }
+                      style={{ backgroundColor: item.value }}
+                    >
+                      {item.value[0] === "#" ? null : item.value}
+                    </button>
+                  ) : (
+                    <button
+                      key={index}
+                      className={
+                        item.value[0] === "#"
+                          ? styles.SelectedColorAttributeBox
+                          : styles.attributeButtonBox
                       }
+                      onClick={() =>
+                        this.attributeSelectionHandler(
+                          product.id,
+                          attribute.id,
+                          item.id
+                        )
+                      }
+                      style={{ backgroundColor: item.value }}
                     >
                       {item.value[0] === "#" ? null : item.value}
                     </button>
@@ -196,6 +206,9 @@ class Modal extends Component {
                 });
                 attributeRenderableItems.push(
                   <div className={styles.AttributesWraper} key={index}>
+                    <p className={styles.AttributeName}>
+                      {attribute.name.toUpperCase() + ":"}
+                    </p>
                     {renderableItems}
                   </div>
                 );
@@ -266,7 +279,7 @@ class Modal extends Component {
         );
       });
     }
-    //TODO: Move it function
+
     let priceArray = [];
     if (orderData && orderData.length > 0)
       orderData.forEach((product) => {
@@ -293,10 +306,12 @@ class Modal extends Component {
     }
 
     return (
-      <div className={styles.Modal}>
+      <div>
         <div className={styles.ModalWindow}>
           <h1 className={styles.CartHeadline}>My Bag,</h1>
-          <p className={styles.ItemQuantity}>{this.props.orderQuantity} items</p>
+          <p className={styles.ItemQuantity}>
+            {this.props.orderQuantity} items
+          </p>
           {itemList}
           <p className={styles.Total}>Total:</p>
           <p className={styles.TotalNumber}>{totalPrice}</p>
@@ -313,6 +328,7 @@ class Modal extends Component {
             CHECK OUT
           </button>
         </div>
+        <div className={styles.Modal} onClick={() => this.closeModal()} />
       </div>
     );
   }
@@ -322,16 +338,23 @@ const mapStateToProps = (state) => {
     currency: state.currency,
     showModal: state.showModal,
     orderData: state.orderData,
+    cartClick: state.cartClick,
+    currencyDisable: state.currencyDisable,
   };
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    displayModal: () => {
-      dispatch({ type: "SHOW_MODAL" });
+    displayModal: (event) => {
+      dispatch({ type: "SHOW_MODAL", show: event });
     },
     saveOrderData: (order) => {
       dispatch({ type: "SAVE_ORDER_DATA", data: order });
     },
+    disableCurrencyButton: (event) => {
+      dispatch({ type: "DISABLE_CURRENCY", disable: event });
+    },
+    currentCartClick: (event) =>
+      dispatch({ type: "SAVE_CARTICON_CLICK", clicked: event }),
   };
 };
 

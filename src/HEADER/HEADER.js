@@ -1,10 +1,9 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
 import styles from "./HEADER.module.css";
+import CategoryLinks from "./Navigation/CATEGORYLINKS";
 import Currency from "../CURRENCY/CURRENCY";
-import { TAB_NAMES } from "../Constants";
 import Modal from "../MODAL/MODAL";
 
 class Header extends Component {
@@ -12,11 +11,8 @@ class Header extends Component {
     super(props);
 
     this.state = {
-      activeTab: TAB_NAMES.WOMEN,
-      orderData: [],
+      orderData: []
     };
-
-    this.tabClickHandler = this.tabClickHandler.bind(this);
     this.modalClickHandler = this.modalClickHandler.bind(this);
   }
 
@@ -24,7 +20,7 @@ class Header extends Component {
     this.setState({ orderData: this.props.orderData });
   }
 
-  saveOrder(updatedOrder){
+  saveOrder(updatedOrder) {
     this.setState({ orderData: updatedOrder });
     localStorage.setItem("order", JSON.stringify(updatedOrder));
     this.props.saveOrderData(updatedOrder);
@@ -37,18 +33,18 @@ class Header extends Component {
     }
   }
 
-  tabClickHandler = (activeTab) => {
-    this.setState({ activeTab });
-  };
-
   modalClickHandler() {
-    if (this.props.orderData.length > 0) {
-      return this.props.displayModal();
+    if (this.props.orderData.length >= 1) {
+      this.props.displayModal(true);
+      if (this.props.toggleDropDown) {
+        this.props.toggleDropDownButton(false);
+      }
+      this.props.disableCurrencyButton(true);
     }
   }
 
   render() {
-    const { activeTab, orderData } = this.state;
+    const { orderData } = this.state;
     const { client } = this.props;
 
     let productQuantityInOrder = [];
@@ -67,46 +63,7 @@ class Header extends Component {
 
     return (
       <header className={styles.Header}>
-        <nav className={styles.HeaderNav}>
-          <div>
-            <Link
-              to="/"
-              className={
-                activeTab !== TAB_NAMES.WOMEN ? styles.Link : styles.ClickedLink
-              }
-              onClick={() => {
-                this.tabClickHandler(TAB_NAMES.WOMEN);
-              }}
-            >
-              WOMEN
-            </Link>
-          </div>
-
-          <div>
-            <Link
-              to="/men"
-              className={activeTab !== TAB_NAMES.MEN ? styles.Link : styles.ClickedLink}
-              onClick={() => {
-                this.tabClickHandler(TAB_NAMES.MEN);
-              }}
-            >
-              MEN
-            </Link>
-          </div>
-
-          <div>
-            <Link
-              to="/kids"
-              className={activeTab !== TAB_NAMES.KIDS ? styles.Link : styles.ClickedLink}
-              onClick={() => {
-                this.tabClickHandler(TAB_NAMES.KIDS);
-              }}
-            >
-              KIDS
-            </Link>
-          </div>
-        </nav>
-
+        <CategoryLinks client={this.props.client} />
         <div className={styles.BrandIcon}>
           <svg
             className={styles.IconBack}
@@ -224,11 +181,16 @@ class Header extends Component {
           </div>
 
           {orderQuantity >= 1 && (
-            <div className={styles.ProductCounter}>
+            <div
+              className={styles.ProductCounter}
+              onClick={this.modalClickHandler}
+            >
               {orderQuantity.length === 1 ? (
                 <p className={styles.NumberOfCounter}>{orderQuantity}</p>
               ) : (
-                <p className={styles.NumberOfCounterPosition}>{orderQuantity}</p>
+                <p className={styles.NumberOfCounterPosition}>
+                  {orderQuantity}
+                </p>
               )}
             </div>
           )}
@@ -242,15 +204,23 @@ const mapStateToProps = (state) => {
   return {
     showModal: state.showModal,
     orderData: state.orderData,
+    toggleDropDown: state.toggleDropDown,
+    currencyDisable: state.currencyDisable,
   };
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    displayModal: () => {
-      dispatch({ type: "SHOW_MODAL" });
+    displayModal: (event) => {
+      dispatch({ type: "SHOW_MODAL", show: event });
     },
     saveOrderData: (order) => {
       dispatch({ type: "SAVE_ORDER_DATA", data: order });
+    },
+    disableCurrencyButton: (event) => {
+      dispatch({ type: "DISABLE_CURRENCY", disable: event });
+    },
+    toggleDropDownButton: (event) => {
+      dispatch({ type: "CLOSE_DROPDOWN", toggle: event });
     },
   };
 };

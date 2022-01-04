@@ -1,18 +1,23 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Source+Sans+Pro:wght@200;300;400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Source+Sans+Pro:wght@200;300&display=swap");
 .Modal {
   position: absolute;
   width: 1686px;
-  height: 1496px;
-  left: -135px;
+  height: 300vh;
+  left: -138px;
   top: 78px;
   background: rgba(57, 55, 72, 0.22);
-  z-index: 200;
+  z-index: 100;
+  cursor: pointer;
 }
 
 .ModalWindow {
   position: absolute;
   width: 325px;
-  left: 1131px;
+  left: 1005px;
   background: #ffffff;
+  z-index: 101;
+  top: 77px;
 }
 
 .CartHeadline {
@@ -46,14 +51,14 @@
   position: relative;
   left: 16px;
   top: 40px;
-  margin-bottom: 90px;
-  width: 1217px;
+  margin-bottom: 60px;
 }
 
 .NameOfBrand {
   position: sticky;
   height: 52px;
   left: 57px;
+  width: 200px;
   font-family: Raleway;
   font-style: normal;
   font-weight: 300;
@@ -78,7 +83,7 @@
 .PriceOfProduct {
   position: absolute;
   width: 52px;
-  top: 75px;
+  top: 63px;
   font-family: Raleway;
   font-style: normal;
   font-weight: 500;
@@ -90,19 +95,70 @@
 .AttributesWraper {
   display: flex;
   flex-direction: row;
+  height: 49px;
   position: relative;
   top: 67px;
   justify-content: flex-start;
 }
+.AttributeName {
+  position: absolute;
+  width: 204px;
+  top: -32px;
+  font-family: Roboto Condensed;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 13px;
+}
 
-.AttributeButton {
+.SelectedAttributeButton {
   margin-right: 9px;
   margin-bottom: 9px;
+  position: relative;
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: normal;
+  height: 24px;
+  font-size: 12px;
+  color: #1d1f22;
+  border: 1px solid #808080;
+  pointer-events: none;
+}
+.ColorAttributeBox {
+  margin-right: 9px;
+  margin-bottom: 9px;
+  position: relative;
+  width: 24px;
   height: 24px;
   font-size: 12px;
   background-color: white;
+  color: #a6a6a6;
+  border: 2px solid #1d1f22;
 }
-.AttributeButton:hover {
+.SelectedColorAttributeBox {
+  margin-right: 9px;
+  margin-bottom: 9px;
+  height: 24px;
+  width: 24px;
+  font-size: 12px;
+  background-color: white;
+  color: #a6a6a6;
+  border: 1px solid #1d1f22;
+}
+
+.attributeButtonBox {
+  margin-right: 9px;
+  margin-bottom: 9px;
+  height: 24px;
+  position: relative;
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  background-color: white;
+  color: #1d1f22;
+  border: 0.5px solid #1d1f22;
+}
+.attributeButtonBox:hover {
   background-color: black;
   color: white;
   cursor: pointer;

@@ -15,10 +15,10 @@ class Currency extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currencies: undefined,
-      clicked: false,
+      currencies: undefined
     };
     this.arrowClickHandler = this.arrowClickHandler.bind(this);
+    this.closeClickHandler = this.closeClickHandler.bind(this);
   }
 
   async componentDidMount() {
@@ -32,8 +32,14 @@ class Currency extends Component {
   }
 
   arrowClickHandler() {
-    const { clicked } = this.state;
-    this.setState({ clicked: !clicked });
+    if (!this.props.currencyDisable) {
+      const { toggleDropDown } = this.props;
+      this.props.toggleDropDownButton(!toggleDropDown);
+    }
+  }
+
+  closeClickHandler() {
+    this.props.toggleDropDownButton(false);
   }
 
   clickedCurrencyHandler(currency) {
@@ -43,16 +49,15 @@ class Currency extends Component {
         : getSymbolFromCurrency(currency);
 
     this.props.currentCurrencyIcon(symbol);
-
-    this.setState({ clicked: false });
+    this.props.toggleDropDownButton(false);
   }
 
   render() {
     const { currencies } = this.state;
-    const { clicked } = this.state;
+    const { toggleDropDown } = this.props;
 
     let dropDown = [];
-    if (clicked)
+    if (toggleDropDown)
       currencies.map((element, index) => {
         return dropDown.push(
           <p
@@ -69,7 +74,9 @@ class Currency extends Component {
 
     return (
       <div>
-        <p className={styles.Currency}>{this.props.currency}</p>
+        <p className={styles.Currency} onClick={this.arrowClickHandler}>
+          {this.props.currency}
+        </p>
         <svg
           onClick={this.arrowClickHandler}
           className={styles.DownArrow}
@@ -86,7 +93,12 @@ class Currency extends Component {
             strokeLinejoin="round"
           />
         </svg>
-        <div className={styles.DropDownBackground}>{dropDown}</div>
+
+        {this.props.showModal === false && (
+          <div className={styles.Background} onClick={this.closeClickHandler}>
+            <div className={styles.DropDownBackground}>{dropDown}</div>
+          </div>
+        )}
       </div>
     );
   }
@@ -94,6 +106,9 @@ class Currency extends Component {
 const mapStateToProps = (state) => {
   return {
     currency: state.currency,
+    currencyDisable: state.currencyDisable,
+    toggleDropDown: state.toggleDropDown,
+    showModal: state.showModal,
   };
 };
 
@@ -101,6 +116,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     currentCurrencyIcon: (id) => {
       dispatch({ type: "CHANGE_ICON", id: id });
+    },
+    toggleDropDownButton: (event) => {
+      dispatch({ type: "CLOSE_DROPDOWN", toggle: event });
     },
   };
 };
